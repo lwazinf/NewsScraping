@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup as bs4
 import urllib.request
 import re
 
-source = urllib.request.urlopen('https://www.forexlive.com/page/2').read()
+source = urllib.request.urlopen('https://www.forexlive.com/page/1').read()
 soup = bs4(source, 'html.parser')
 
 data = soup.find_all("div", {"class": "article-list__item-wrapper"})
@@ -32,4 +32,19 @@ def newEntry(index_):
 
     return df
 
-newEntry(0)
+df = pd.DataFrame(columns=['time', 'day', 'date', 'month', 'year', 'type', 'brief', 'body'])
+
+dataRange_ = 5
+for x in range(len(data)):
+    a = 'nasdaq' in data[x].find_all('li', {'class': 'text-body'})[0].text.replace('\n', '').lower()
+    a_ = 'nasdaq' in data[x].find_all('div', {'class': 'article-slot__wrapper'})[0].attrs['brief']
+    b = 'us100' in data[x].find_all('li', {'class': 'text-body'})[0].text.replace('\n', '').lower()
+    b_ = 'us100' in data[x].find_all('div', {'class': 'article-slot__wrapper'})[0].attrs['brief']
+    c = 'usa100' in data[x].find_all('li', {'class': 'text-body'})[0].text.replace('\n', '').lower()
+    c_ = 'usa100' in data[x].find_all('div', {'class': 'article-slot__wrapper'})[0].attrs['brief']
+    if (a or a_ or b or b_ or c or  c_):
+        newEntry(x)
+
+df
+
+df
