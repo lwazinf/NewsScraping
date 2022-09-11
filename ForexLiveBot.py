@@ -3,15 +3,9 @@ from bs4 import BeautifulSoup as bs4
 import urllib.request
 import re
 
-source = urllib.request.urlopen('https://www.forexlive.com/page/1').read()
-soup = bs4(source, 'html.parser')
-
-data = soup.find_all("div", {"class": "article-list__item-wrapper"})
-
-remove_lower = lambda text: re.sub('[a-z]', '', text)
-
+page_ = 1
 df = pd.DataFrame(columns=['time', 'day', 'date', 'month', 'year', 'type', 'brief', 'body'])
-
+remove_lower = lambda text: re.sub('[a-z]', '', text)
 def newEntry(index_):
     global df
     df = pd.concat([
@@ -32,19 +26,26 @@ def newEntry(index_):
 
     return df
 
-df = pd.DataFrame(columns=['time', 'day', 'date', 'month', 'year', 'type', 'brief', 'body'])
+# while len(df.index) < 10:
+for i in range(5):
+    global page_
 
-dataRange_ = 5
-for x in range(len(data)):
-    a = 'nasdaq' in data[x].find_all('li', {'class': 'text-body'})[0].text.replace('\n', '').lower()
-    a_ = 'nasdaq' in data[x].find_all('div', {'class': 'article-slot__wrapper'})[0].attrs['brief']
-    b = 'us100' in data[x].find_all('li', {'class': 'text-body'})[0].text.replace('\n', '').lower()
-    b_ = 'us100' in data[x].find_all('div', {'class': 'article-slot__wrapper'})[0].attrs['brief']
-    c = 'usa100' in data[x].find_all('li', {'class': 'text-body'})[0].text.replace('\n', '').lower()
-    c_ = 'usa100' in data[x].find_all('div', {'class': 'article-slot__wrapper'})[0].attrs['brief']
-    if (a or a_ or b or b_ or c or  c_):
+    source = urllib.request.urlopen(f'https://www.forexlive.com/page/{page_}').read()
+    soup = bs4(source, 'html.parser')
+    data = soup.find_all("div", {"class": "article-list__item-wrapper"})
+    for x in range(len(data)):
+        # print(x)
+        # print(page_)
+        # print(range(len(data)))
+        #
+        # a = 'nasdaq' in data[x].find_all('li', {'class': 'text-body'})[0].text.replace('\n', '').lower()
+        # a_ = 'nasdaq' in data[x].find_all('div', {'class': 'article-slot__wrapper'})[0].attrs['brief']
+        #
+        # if (a or a_):
         newEntry(x)
 
-df
+    page_ = page_+1
 
-df
+
+
+len(df.index)
